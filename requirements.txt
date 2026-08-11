@@ -1,1 +1,6 @@
-libgl1
+streamlit>=1.38.0
+streamlit-webrtc>=0.47.9
+ultralytics>=8.3.0
+av>=13.0.0
+numpy>=1.26.4
+ 
