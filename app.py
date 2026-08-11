@@ -60,12 +60,42 @@ class ProcessadorYolo(VideoProcessorBase):
 
 
 # ---------------------------------------------------------------------------
+# Configuração RTC: STUN sozinho costuma falhar no Streamlit Community Cloud,
+# pois o ambiente restringe conexões UDP diretas. Um servidor TURN retransmite
+# o tráfego de vídeo quando a conexão direta não é possível. Usamos aqui o TURN
+# público gratuito do Open Relay Project (adequado para protótipo/demonstração;
+# para produção, use um TURN próprio ou um serviço pago como Twilio/Metered).
+# ---------------------------------------------------------------------------
+RTC_CONFIGURATION = {
+    "iceServers": [
+        {"urls": ["stun:stun.l.google.com:19302"]},
+        {
+            "urls": ["turn:openrelay.metered.ca:80"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+        {
+            "urls": ["turn:openrelay.metered.ca:443"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+        {
+            "urls": ["turn:openrelay.metered.ca:443?transport=tcp"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+    ]
+}
+
+
+# ---------------------------------------------------------------------------
 # Botão/controle para abrir a câmera e iniciar a detecção em tempo real
 # webrtc_streamer já fornece nativamente o botão de "Start"/"Stop" da câmera.
 # ---------------------------------------------------------------------------
 webrtc_streamer(
     key="scanner-yolo",
     mode=WebRtcMode.SENDRECV,
+    rtc_configuration=RTC_CONFIGURATION,
     video_processor_factory=ProcessadorYolo,
     media_stream_constraints={"video": True, "audio": False},
     async_processing=True,
